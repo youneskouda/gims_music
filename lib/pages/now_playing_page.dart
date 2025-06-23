@@ -5,13 +5,11 @@ import '../models/song_model.dart';
 import '../providers/audio_player_provider.dart';
 
 class NowPlayingPage extends StatefulWidget {
-  final Song song;
   final List<Song> songList;
   final int index;
 
   const NowPlayingPage({
     super.key,
-    required this.song,
     required this.songList,
     required this.index,
   });
@@ -30,7 +28,9 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
     _audioProvider = Provider.of<AudioPlayerProvider>(context, listen: false);
     _currentIndex = widget.index;
 
-    // Do NOT play the song again here — already handled in HomePage
+    final songPaths = widget.songList.map((s) => s.url).toList();
+    _audioProvider.play(songPaths[_currentIndex], _currentIndex, songPaths);
+
     _audioProvider.player.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
         _nextSong();
@@ -41,26 +41,30 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
   void _nextSong() async {
     if (_currentIndex < widget.songList.length - 1) {
       setState(() => _currentIndex++);
-      await _audioProvider.play(widget.songList[_currentIndex].url, _currentIndex);
+      final songPaths = widget.songList.map((s) => s.url).toList();
+      await _audioProvider.play(songPaths[_currentIndex], _currentIndex, songPaths);
     }
   }
 
   void _previousSong() async {
     if (_currentIndex > 0) {
       setState(() => _currentIndex--);
-      await _audioProvider.play(widget.songList[_currentIndex].url, _currentIndex);
+      final songPaths = widget.songList.map((s) => s.url).toList();
+      await _audioProvider.play(songPaths[_currentIndex], _currentIndex, songPaths);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final song = widget.songList[_currentIndex];
-    final player = _audioProvider.player;
+    final audioProvider = Provider.of<AudioPlayerProvider>(context);
+final player = audioProvider.player;
+final song = widget.songList[_currentIndex];
+
+
 
     return Scaffold(
       body: Stack(
         children: [
-          // 🎨 Background image
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -73,8 +77,6 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
               ),
             ),
           ),
-
-          // 🎵 Music controls and info
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -91,8 +93,6 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
                   style: const TextStyle(fontSize: 18, color: Colors.white70),
                 ),
                 const SizedBox(height: 40),
-
-                // 🎧 Progress bar
                 StreamBuilder<Duration>(
                   stream: player.positionStream,
                   builder: (context, snapshot) {
@@ -102,7 +102,7 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
                     return Column(
                       children: [
                         Slider(
-                          value: position.inSeconds.toDouble(),
+                          value: position.inSeconds.toDouble().clamp(0, duration.inSeconds.toDouble()),
                           min: 0,
                           max: duration.inSeconds.toDouble(),
                           onChanged: (value) {
@@ -125,10 +125,7 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
                     );
                   },
                 ),
-
                 const SizedBox(height: 40),
-
-                // 🎮 Controls
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -137,8 +134,8 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
                       onPressed: _previousSong,
                     ),
                     IconButton(
-                      icon: Icon(
-                        _audioProvider.isPlaying ? Icons.pause : Icons.play_arrow,
+                     icon: Icon(
+                      audioProvider.isPlaying ? Icons.pause : Icons.play_arrow,
                         size: 36,
                         color: Colors.white,
                       ),
