@@ -35,9 +35,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   
-  just_audio: ^0.10.4
-  audio_service: ^0.18.12
-  audio_session: ^0.1.18
+  just_audio: ^0.9.36
+  audio_service: ^0.18.11
+  just_audio_background: ^0.0.1-beta.10
+  audio_session: ^0.1.14
   provider: ^6.1.1
 
 
