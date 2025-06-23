@@ -10,17 +10,17 @@ class AudioPlayerProvider with ChangeNotifier {
 
   bool get isPlaying => _player.playing;
 
-  Future<void> play(String assetPath, int index, List<String> songPaths) async {
-    try {
-      await _player.stop();
-      await _player.setAsset(assetPath);
-      await _player.play();
-      _currentIndex = index;
-      notifyListeners();
-    } catch (e) {
-      print("Error playing song: $e");
-    }
+  Future<void> play(String assetPath, int index) async {
+  try {
+    await _player.setAsset(assetPath);
+    await _player.play();
+    _currentIndex = index;
+    notifyListeners();
+  } catch (e) {
+    print("Error playing song: $e");
   }
+}
+
 
   void togglePlayPause() {
     if (_player.playing) {

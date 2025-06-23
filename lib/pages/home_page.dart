@@ -246,7 +246,7 @@ class HomePage extends StatelessWidget {
                   subtitle: Text(song.artist, style: const TextStyle(color: Colors.white70)),
                   onTap: () async {
                     if (audioProvider.currentIndex != index) {
-                      await audioProvider.play(song.url, index, songs.map((s) => s.url).toList());
+                          await audioProvider.play(song.url, index);
 
                     }
                     Navigator.push(

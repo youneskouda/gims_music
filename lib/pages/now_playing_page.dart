@@ -22,14 +22,13 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
   late AudioPlayerProvider _audioProvider;
   late int _currentIndex;
 
-    @override
+  @override
   void initState() {
     super.initState();
     _audioProvider = Provider.of<AudioPlayerProvider>(context, listen: false);
     _currentIndex = widget.index;
 
-    final songPaths = widget.songList.map((s) => s.url).toList();
-    _audioProvider.play(songPaths[_currentIndex], _currentIndex, songPaths);
+    _audioProvider.play(widget.songList[_currentIndex].url, _currentIndex);
 
     _audioProvider.player.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
@@ -38,31 +37,24 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
     });
   }
 
-
   void _nextSong() async {
     if (_currentIndex < widget.songList.length - 1) {
       setState(() => _currentIndex++);
-      final songPaths = widget.songList.map((s) => s.url).toList();
-      await _audioProvider.play(songPaths[_currentIndex], _currentIndex, songPaths);
+      await _audioProvider.play(widget.songList[_currentIndex].url, _currentIndex);
     }
   }
 
   void _previousSong() async {
     if (_currentIndex > 0) {
       setState(() => _currentIndex--);
-      final songPaths = widget.songList.map((s) => s.url).toList();
-      await _audioProvider.play(songPaths[_currentIndex], _currentIndex, songPaths);
+      await _audioProvider.play(widget.songList[_currentIndex].url, _currentIndex);
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final audioProvider = Provider.of<AudioPlayerProvider>(context);
-final player = audioProvider.player;
-final song = widget.songList[_currentIndex];
-
-
+    final song = widget.songList[_currentIndex];
+    final player = _audioProvider.player;
 
     return Scaffold(
       body: Stack(
@@ -136,8 +128,8 @@ final song = widget.songList[_currentIndex];
                       onPressed: _previousSong,
                     ),
                     IconButton(
-                     icon: Icon(
-                      audioProvider.isPlaying ? Icons.pause : Icons.play_arrow,
+                      icon: Icon(
+                        _audioProvider.isPlaying ? Icons.pause : Icons.play_arrow,
                         size: 36,
                         color: Colors.white,
                       ),
