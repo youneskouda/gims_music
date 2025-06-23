@@ -10,7 +10,6 @@ class AudioPlayerProvider with ChangeNotifier {
 
   bool get isPlaying => _player.playing;
 
-  /// Play a new song with updated index and list
   Future<void> play(String assetPath, int index, List<String> songPaths) async {
     try {
       await _player.stop();
@@ -18,19 +17,11 @@ class AudioPlayerProvider with ChangeNotifier {
       await _player.play();
       _currentIndex = index;
       notifyListeners();
-
-      // Auto play next song when finished
-      _player.playerStateStream.listen((state) {
-        if (state.processingState == ProcessingState.completed) {
-          playNext(songPaths);
-        }
-      });
     } catch (e) {
       print("Error playing song: $e");
     }
   }
 
-  /// Pause or resume playback
   void togglePlayPause() {
     if (_player.playing) {
       _player.pause();
@@ -40,23 +31,8 @@ class AudioPlayerProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Stop audio completely
   void stop() {
     _player.stop();
     notifyListeners();
-  }
-
-  /// Play next song
-  Future<void> playNext(List<String> songPaths) async {
-    if (_currentIndex != null && _currentIndex! + 1 < songPaths.length) {
-      await play(songPaths[_currentIndex! + 1], _currentIndex! + 1, songPaths);
-    }
-  }
-
-  /// Play previous song
-  Future<void> playPrevious(List<String> songPaths) async {
-    if (_currentIndex != null && _currentIndex! > 0) {
-      await play(songPaths[_currentIndex! - 1], _currentIndex! - 1, songPaths);
-    }
   }
 }

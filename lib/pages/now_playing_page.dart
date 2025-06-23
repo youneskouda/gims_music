@@ -22,7 +22,7 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
   late AudioPlayerProvider _audioProvider;
   late int _currentIndex;
 
-  @override
+    @override
   void initState() {
     super.initState();
     _audioProvider = Provider.of<AudioPlayerProvider>(context, listen: false);
@@ -37,6 +37,7 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
       }
     });
   }
+
 
   void _nextSong() async {
     if (_currentIndex < widget.songList.length - 1) {
@@ -53,6 +54,7 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
       await _audioProvider.play(songPaths[_currentIndex], _currentIndex, songPaths);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
