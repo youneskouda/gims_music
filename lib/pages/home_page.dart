@@ -1,11 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 import '../models/song_model.dart';
 import '../providers/audio_player_provider.dart';
 import 'now_playing_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  BannerAd? _bannerAd;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _bannerAd = BannerAd(
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // ✅ Test Banner ID
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) => setState(() {}),
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          print('❌ Banner Ad failed to load: $error');
+        },
+      ),
+    )..load();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +238,7 @@ class HomePage extends StatelessWidget {
       // Add more songs here...
     ];
 
-    return Scaffold(
+   return Scaffold(
       appBar: AppBar(
         title: const Text("🎵 GIMS Music"),
         backgroundColor: Colors.black87,
@@ -227,14 +255,14 @@ class HomePage extends StatelessWidget {
             ),
           ),
 
-          // 🔲 Song list over dark background
+          // 🔲 Song list over dark overlay
           Container(
             color: Colors.black.withOpacity(0.6),
             child: ListView.builder(
+              padding: const EdgeInsets.only(bottom: 60),
               itemCount: songs.length,
               itemBuilder: (context, index) {
                 final song = songs[index];
-
                 return ListTile(
                   leading: Image.asset(
                     song.image,
@@ -242,19 +270,28 @@ class HomePage extends StatelessWidget {
                     height: 50,
                     fit: BoxFit.cover,
                   ),
-                  title: Text(song.title, style: const TextStyle(color: Colors.white)),
-                  subtitle: Text(song.artist, style: const TextStyle(color: Colors.white70)),
+                  title: Text(
+                    song.title,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    song.artist,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
                   onTap: () async {
                     if (audioProvider.currentIndex != index) {
-                          await audioProvider.play(song.url, index);
-
+                      await audioProvider.play(
+                        song.url,
+                        index,
+                        songs.map((s) => s.url).toList(),
+                      );
                     }
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => NowPlayingPage(
-    songList: songs,
-    index: index,
+                        builder: (context) => NowPlayingPage(
+                          songList: songs,
+                          index: index,
                         ),
                       ),
                     );
@@ -263,6 +300,19 @@ class HomePage extends StatelessWidget {
               },
             ),
           ),
+
+          // 📢 Banner Ad at bottom
+          if (_bannerAd != null)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: SizedBox(
+                height: _bannerAd!.size.height.toDouble(),
+                width: _bannerAd!.size.width.toDouble(),
+                child: AdWidget(ad: _bannerAd!),
+              ),
+            ),
         ],
       ),
     );

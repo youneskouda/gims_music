@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'pages/home_page.dart';
-import 'providers/audio_player_provider.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AudioPlayerProvider(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'GIMS Music',
-        theme: ThemeData(
-          primarySwatch: Colors.deepPurple,
-        ),
-        home: const HomePage(),
-      ),
+    return MaterialApp(
+      title: 'GIMS Music',
+      debugShowCheckedModeBanner: false,
+      home: HomePage(), // Your home page
     );
   }
 }

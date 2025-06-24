@@ -28,7 +28,11 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
     _audioProvider = Provider.of<AudioPlayerProvider>(context, listen: false);
     _currentIndex = widget.index;
 
-    _audioProvider.play(widget.songList[_currentIndex].url, _currentIndex);
+    _audioProvider.play(
+  widget.songList[_currentIndex].url,
+  _currentIndex,
+  widget.songList.map((s) => s.url).toList(),
+);
 
     _audioProvider.player.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
@@ -40,14 +44,22 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
   void _nextSong() async {
     if (_currentIndex < widget.songList.length - 1) {
       setState(() => _currentIndex++);
-      await _audioProvider.play(widget.songList[_currentIndex].url, _currentIndex);
+      await _audioProvider.play(
+  widget.songList[_currentIndex].url,
+  _currentIndex,
+  widget.songList.map((s) => s.url).toList(),
+);
     }
   }
 
   void _previousSong() async {
     if (_currentIndex > 0) {
       setState(() => _currentIndex--);
-      await _audioProvider.play(widget.songList[_currentIndex].url, _currentIndex);
+      await _audioProvider.play(
+  widget.songList[_currentIndex].url,
+  _currentIndex,
+  widget.songList.map((s) => s.url).toList(),
+);
     }
   }
 
@@ -60,16 +72,16 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(song.image),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.6),
-                  BlendMode.darken,
-                ),
-              ),
-            ),
+         decoration: BoxDecoration(
+  image: DecorationImage(
+    image: AssetImage(song.image),
+    fit: BoxFit.cover,
+    colorFilter: ColorFilter.mode(
+      Colors.black.withOpacity(0.6),
+      BlendMode.darken,
+    ),
+  ),
+),
           ),
           Center(
             child: Column(

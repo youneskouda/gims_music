@@ -10,7 +10,7 @@ class AudioPlayerProvider with ChangeNotifier {
 
   bool get isPlaying => _player.playing;
 
-  Future<void> play(String assetPath, int index) async {
+  Future<void> play(String assetPath, int index, List<String> list) async {
   try {
     await _player.setAsset(assetPath);
     await _player.play();
